@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <title>Google Maps Project</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        height: 100%;
+        position: relative;
+      }
+
+      #map {
+        height: 100%;
+        left: 372px;
+        right: 0px;
+        bottom: 0px;
+        position: absolute;
+      }
+
+      .search-panel {
+        width: 350px;
+        height: 100%;
+        text-align: left;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px 10px 0 10px;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 25px;
+        margin: 0 0 10px 0;
+      }
+
+      #search-box {
+        width: 262px;
+        height: 30px;
+      }
+
+      #search-button {
+        width: 80px;
+        height: 35px;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="search-panel">
+        <h1>Find Your Neighborhood!</h1>
+        <hr>
+        <input id="search-box" type="text" placeholder="Search An Address">
+        <input id="search-button" type="button" value="Search">
+      </div>
+      <div id="map"></div>
+    </div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 8, center:{lat: 38.907313, lng: -76.774371}
+        });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var markers = [];
+
+        var locations = [
+          {title: "Six flags America", location:{lat: 38.907313, lng: -76.774371}},
+          {title: "Springfield", location:{lat: 38.7892801, lng: -77.18720359999998}},
+          {title: "Smithsonian National Museums", location:{lat: 38.888152, lng: -77.019868}},
+          {title: "Washington D.C.", location:{lat :38.904735, lng: -77.037244}},
+          {title: "Ocean City", location:{lat: 38.391591, lng: -75.064601}}
+        ];
+
+        for (var i = 0; i < locations.length; i++) {
+          var position = locations[i].location;
+          var title = locations[i].title;
+
+          var marker = new google.maps.Marker({
+            position: position,
+            map: map,
+            title: title,
+            animation: google.maps.animation.DROP,
+            id: i
+          });
+        }
+      }
+
+      var koViewModel = function() {
+        this.Places = [];
+        locationList.forEach(function(place) {
+          this.allPlaces.push(new Place(place));
+        });
+      }
+      document.getElementById('search-button').addEventListener('click', function search() {
+        var geocoder = new google.maps.Geocoder();
+        var address = document.getElementById('search-box').value;
+        if (address == " ") {
+          console.log("Please enter an address!");
+        }
+        else {
+          geocoder.geocode(
+            {address: address}, function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                map.setZoom(8);
+              }
+                else {
+                  window.alert("Location could not be found, please try again.")
+                }
+            });
+        }
+      });
+
+      ko.applyBindings(new koViewModel());
+
+      function populateInfoWindow(marker, infowindow) {
+        console.log(marker);
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            infowindow.setContent('loading...');
+            infowindow.open(map, marker);
+
+            var client_id = 'I5ACAPWNU1FZXPWOMVRQ51UVLGLEABEWHVH0ANYNIHNGHYBN',
+                client_secret = 'XDCDXF3ZJ3QKHP3LL52DQF0FO4RXU2QQNTLWLI1GYWBOCWMV',
+                query = "restaurant",
+                location,
+                venue;
+
+            $.ajax({
+                url:'https://api.foursquare.com/v2/venues/search',
+                dataType: 'json',
+                data:   {
+                    limit: '1',
+                    ll: '40.707496,-73.990774',
+                    query: marker.title,
+                    client_id: client_id,
+                    client_secret: client_secret,
+                    v: '20161113'
+                }
+             }).done(function (data) {
+                 // If incoming data has a venues object set the first one to the var venue
+                 venue = data.response.hasOwnProperty("venues") ? data.response.venues[0] : '';
+
+                 // If the new venue has a property called location set that to the variable location
+                 location = venue.hasOwnProperty('location') ? venue.location : '';
+                 // If new location has prop address then set the observable address to that or blank
+                 if (location.hasOwnProperty('address')) {
+                     var address = location.address || '';
+                 }
+
+                infowindow.marker = marker;
+                infowindow.setContent('<div>' + marker.title + '</div><p>' + address + '</p>');
+                infowindow.open(map, marker);
+                // Make sure the marker property is cleared if the infowindow is closed.
+                infowindow.addListener('closeclick', function() {
+                    infowindow.marker = null;
+                });
+
+             }).fail(function (e) {
+                 infowindow.setContent('<h5>Foursquare data is unavailable.</h5>');
+                 self.showMessage(true);
+             });
+        }
+    }
+    </script>
+    <script async src="knockout-3.4.2.js"></script>
+    <script async defer
+     src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyDxhORQd05l_3z_P-rmUG9AFOoF5oTLLXc&callback=initMap">
+    </script>
+  </body>
+</html>
