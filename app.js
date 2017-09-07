@@ -45,4 +45,17 @@ if (infowindow.marker != marker) {
          self.showMessage(true);
      });
 }
-}
+
+var apiURL = 'https://api.foursquare.com/v2/venues/';
+var foursquareClientID = 'BHU3FSEQDCGVDVFR1MYUNCKJK0HIUZ4SSLPMLDNQTWJCQBNG'
+var foursquareSecret ='QWJVQ0MLI1U4L0ZVHB4W5OJKPYGQEK2GPBF4LQNQJHVBV45X';
+var foursquareVersion = '20170112';
+
+var foursquareURL = apiURL + venueFoursquareID + '?client_id=' + foursquareClientID +  '&client_secret=' + foursquareSecret +'&v=' + foursquareVersion;
+
+$.ajax({
+  url: foursquareURL,
+  success: function(data) {
+    console.log(data);
+  }
+});
