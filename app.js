@@ -46,16 +46,35 @@ if (infowindow.marker != marker) {
      });
 }
 
-var apiURL = 'https://api.foursquare.com/v2/venues/';
-var foursquareClientID = 'BHU3FSEQDCGVDVFR1MYUNCKJK0HIUZ4SSLPMLDNQTWJCQBNG'
-var foursquareSecret ='QWJVQ0MLI1U4L0ZVHB4W5OJKPYGQEK2GPBF4LQNQJHVBV45X';
-var foursquareVersion = '20170112';
+function fourSquare() {
+  var apiURL = 'https://api.foursquare.com/v2/venues/';
+  var foursquareClientID = 'BHU3FSEQDCGVDVFR1MYUNCKJK0HIUZ4SSLPMLDNQTWJCQBNG'
+  var foursquareSecret ='QWJVQ0MLI1U4L0ZVHB4W5OJKPYGQEK2GPBF4LQNQJHVBV45X';
+  var foursquareVersion = '20170112';
 
-var foursquareURL = apiURL + venueFoursquareID + '?client_id=' + foursquareClientID +  '&client_secret=' + foursquareSecret +'&v=' + foursquareVersion;
+  var foursquareURL = apiURL + venueFoursquareID + '?client_id=' + foursquareClientID +  '&client_secret=' + foursquareSecret +'&v=' + foursquareVersion;
 
+  $.ajax({
+    url: foursquareURL,
+    success: function(data) {
+      console.log(data);
+      var rating = data.response.venue.rating;
+      var name =  data.response.venue.name;
+      infowindow.setContent(rating.toString() + name);
+      infowindow.open(map, marker);
+    }
+  });
+}
+
+var wikiUrl = 'http://en.wikipidia.org/w/api.php?action=opensearch&search' + marker.title + '&format=json&callback=wikicallback';
 $.ajax({
-  url: foursquareURL,
-  success: function(data) {
-    console.log(data);
+  Url: wikiUrl,
+  datatype: "jsonp",
+  success: function( responce ) {
+    var articlelist = responce[1];
+    for(var i = 0; i < articlelist.lencth; i++) {
+      var articleStr = articlelist[i];
+      var url = 'http://en.wikipidia.org/wiki/' + articleStr;
+      $wikiElem.append('<li><a href="' + url + '">' + articleStr + '</a></li>');
+    };
   }
-});
