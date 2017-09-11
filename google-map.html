@@ -67,14 +67,13 @@
     </div>
     <script>
       var map;
+      var markers = [];
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 10, center:{lat: 38.907313, lng: -76.774371}
         });
 
         var infoWindow = new google.maps.InfoWindow();
-
-        var markers = [];
 
         var locations = [
           {title: "Six flags America", location:{lat: 38.907313, lng: -76.774371}},
@@ -85,6 +84,10 @@
         ];
 
         for (var i = 0; i < locations.length; i++) {
+          createMarkersForPlaces();
+        }
+
+        function createMarkersForPlaces() {
           var position = locations[i].location;
           var title = locations[i].title;
 
@@ -97,18 +100,18 @@
           });
 
           marker.addListener('click', function() {
-            populateInfoWindow(marker, infoWindow);
+            populateInfoWindow(marker, infoWindow, markers);
             wikiLink();
           });
+
+          markers.push(marker);
         }
 
-        markers.push(marker);
-
-        function populateInfoWindow(marker, infoWindow) {
+        function populateInfoWindow(marker, infoWindow, markers) {
           if (infoWindow.marker != marker) {
             infoWindow.marker = marker;
 
-            infoWindow.setContent('<div>' + marker.title + '</div>');
+            infoWindow.setContent('<div><h2>' + marker.title + '</h2></div>');
             infoWindow.setContent("<div class=\"wikipedia-container\">" +
                 "<h3 id=\"wikipedia-header\">Relevant Wikipedia Links</h3>" +
                 "</div>");
@@ -140,12 +143,6 @@
             });
         }
       });
-
-      var ViewModel = function() {
-        var listMarkers = ko.observableArry(locations);
-      }
-
-      ko.applyBindings(new ViewModel());
 
       function wikiLink() {
         var wikiUrl = 'http://en.wikipidia.org/w/api.php?action=opensearch&search' + marker.title + '&format=json&callback=wikicallback';
