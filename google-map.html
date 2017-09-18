@@ -54,14 +54,14 @@
   <body>
     <div class="container">
       <div class="search-panel">
-        <h1>My Intresting Places!</h1>
+        <h1>Intresting Places to visit!</h1>
         <hr>
         <input id="search-box" type="text" placeholder="Search An Address">
         <input id="search-button" type="button" value="Search">
         <hr>
-        <div class="selector" data-bind="forEach: listMarkers">
-
-        </div>
+        <ul class="selector" data-bind="forEach: listMarkers">
+          <li data-bind="text: listMarkers"></li>
+        </ul>
       </div>
       <div id="map"></div>
     </div>
