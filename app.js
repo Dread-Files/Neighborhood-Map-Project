@@ -1,19 +1,22 @@
-var map;
-var markers = [];
+var map,
+    infoWindow,
+    markers = [];
+
+
+var locations = [
+    {title: "Six flags America", location:{lat: 38.907313, lng: -76.774371}},
+    {title: "Mount Vernon, VA", location:{lat: 38.707961, lng: -77.086521}},
+    {title: "Smithsonian National Museum", location:{lat: 38.888152, lng: -77.019868}},
+    {title: "Burke Lake Park", location:{lat :38.760764, lng: -77.307478}},
+    {title: "Ocean City, VA", location:{lat: 38.391591, lng: -75.064601}}
+];
+
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 10, center:{lat: 38.907313, lng: -76.774371}
   });
 
-  var infoWindow = new google.maps.InfoWindow();
-
-  var locations = [
-    {title: "Six flags America", location:{lat: 38.907313, lng: -76.774371}},
-    {title: "Mount Vernon", location:{lat: 38.707961, lng: -77.086521}},
-    {title: "Smithsonian National Museums", location:{lat: 38.888152, lng: -77.019868}},
-    {title: "Burke Lake Park", location:{lat :38.760764, lng: -77.307478}},
-    {title: "Ocean City", location:{lat: 38.391591, lng: -75.064601}}
-  ];
+  infoWindow = new google.maps.InfoWindow();
 
   for (var i = 0; i < locations.length; i++) {
     createMarkersForPlaces();
@@ -32,21 +35,36 @@ function initMap() {
     });
 
     marker.addListener('click', function() {
-      populateInfoWindow(marker, infoWindow, markers);
-      wikiLink();
+      populateInfoWindow(this, infoWindow);
     });
 
     markers.push(marker);
   }
 
-  function populateInfoWindow(marker, infoWindow, markers) {
+  function populateInfoWindow(marker, infoWindow) {
     if (infoWindow.marker != marker) {
       infoWindow.marker = marker;
 
-      infoWindow.setContent('<div><h2>' + marker.title + '</h2></div>');
-      infoWindow.setContent("<div class=\"wikipedia-container\">" +
+      infoWindow.setContent("<div><h2>" + marker.title + "</h2></div>" + "<div id=\"wiki-container\">" +
           "<h3 id=\"wikipedia-header\">Relevant Wikipedia Links</h3>" +
           "</div>");
+
+      var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&format=json&callback=wikiCallback';
+      $.ajax({
+        url: wikiUrl,
+        dataType: 'jsonp',
+        success: function(responce) {
+          console.log(responce);
+          var articlelist = responce[3];
+          for(var i = 0; i < articlelist.length; i++) {
+            articleStr = articlelist[i];
+            var url = 'http://en.wikipidia.org/wiki/' + articleStr;
+            var $wikiElem = $('#wiki-container');
+            $wikiElem.append('<span><a href="' + url + '">' + articleStr + '</a></span><br>');
+          }
+        }
+      });
+
       infoWindow.open(map, marker);
       infoWindow.addListener('closeclick', function() {
         infoWindow.marker = null;
@@ -76,28 +94,15 @@ document.getElementById('search-button').addEventListener('click', function sear
   }
 });
 
-function wikiLink() {
-  var wikiUrl = 'http://en.wikipidia.org/w/api.php?action=opensearch&search' + marker.title + '&format=json&callback=wikicallback';
-  $.ajax({
-    url: wikiUrl,
-    datatype: "jsonp",
-    success: function(responce) {
-      var articlelist = responce[1];
-      console.log(articlelist);
-      for(var i = 0; i < articlelist.length; i++) {
-        var articleStr = articlelist[i];
-        var url = 'http://en.wikipidia.org/wiki/' + articleStr;
-        $wikiElem.append('<li><a href="' + wikiUrl + '">' + articleStr + '</a></li>');
-      }
-    }
-  });
-}
-
 var ViewModel = function() {
-  var listMarkers = ko.observableArray();
+  var self = this;
+
+  this.listMarkers = ko.observableArray();
   for(var i = 0; i < locations.length; i++) {
-    listMarkers.push(locations[i]);
+    this.listMarkers.push(locations[i]);
   }
 }
 
-ko.applyBindings(new ViewModel());
+var viewModel = new ViewModel();
+
+ko.applyBindings(viewModel);
