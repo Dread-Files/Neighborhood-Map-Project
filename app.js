@@ -100,6 +100,18 @@ var ViewModel = function() {
   this.listMarkers = ko.observableArray();
   for(var i = 0; i < locations.length; i++) {
     this.listMarkers.push(locations[i]);
+    this.className = listMarkers[i].title;
+  }
+
+  this.panToMap function() {
+    var data = className;
+    for(var i = 0; i < locations.length; i++) {
+      if (data == listMarkers[i].title) {
+        var lat = locations[i].location.lat;
+        var lng = locations[i].location.lat;
+        google.maps.panTo(lat, lng)
+      }
+    }
   }
 }
 

@@ -60,7 +60,7 @@
         <input id="search-button" type="button" value="Search">
         <hr>
         <ul class="selector" data-bind="foreach: listMarkers">
-          <li data-bind="text: title"></li>
+          <li data-bind="css: className, text: title, click: panToMap"></li>
         </ul>
       </div>
       <div id="map"></div>
