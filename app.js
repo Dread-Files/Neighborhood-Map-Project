@@ -31,7 +31,8 @@ function initMap() {
       animation: google.maps.Animation.DROP,
       map: map,
       title: title,
-      id: i
+      id: i,
+      zoom: 13
     });
 
     marker.addListener('click', function() {
@@ -55,12 +56,12 @@ function initMap() {
         dataType: 'jsonp',
         success: function(responce) {
           console.log(responce);
-          var articlelist = responce[3];
+          var articlelist = responce[1];
           for(var i = 0; i < articlelist.length; i++) {
             articleStr = articlelist[i];
-            var url = 'http://en.wikipidia.org/wiki/' + articleStr;
+            var url = 'http://en.wikipidia.org/wiki/' + responce[3];
             var $wikiElem = $('#wiki-container');
-            $wikiElem.append('<span><a href="' + url + '">' + articleStr + '</a></span><br>');
+            $wikiElem.append('<span><a href=\"' + url + '\">' + articleStr + '</a></span><br>');
           }
         }
       });
@@ -100,16 +101,15 @@ var ViewModel = function() {
   this.listMarkers = ko.observableArray();
   for(var i = 0; i < locations.length; i++) {
     this.listMarkers.push(locations[i]);
-    this.className = listMarkers[i].title;
   }
 
-  this.panToMap function() {
-    var data = className;
+  this.panToMap = function() {
+    this.$data = $("#selector");
     for(var i = 0; i < locations.length; i++) {
-      if (data == listMarkers[i].title) {
-        var lat = locations[i].location.lat;
-        var lng = locations[i].location.lat;
-        google.maps.panTo(lat, lng)
+      if (this.$data == locations[i].title) {
+        this.lat = locations[i].location.lat;
+        this.lng = locations[i].location.lng;
+        google.maps.panTo(this.lat, this.lng);
       }
     }
   }
