@@ -75,25 +75,22 @@ function initMap() {
   }
 }
 
-document.getElementById('search-button').addEventListener('click', function search() {
-  var geocoder = new google.maps.Geocoder();
-  var address = document.getElementById('search-box').value;
-  if (address == " ") {
-    console.log("Please enter an address!");
-  }
-  else {
-    geocoder.geocode(
-      {address: address}, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-          map.setCenter(results[0].geometry.location);
-          map.setZoom(8);
+function myFunction() {
+    var input, filter, ul, li, a, i;
+    input = document.getElementById('search-box');
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("items");
+    li = ul.getElementsByTagName('li');
+
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
         }
-          else {
-            window.alert("Location could not be found, please try again.");
-          }
-      });
-  }
-});
+    }
+}
 
 var ViewModel = function() {
   var self = this;
