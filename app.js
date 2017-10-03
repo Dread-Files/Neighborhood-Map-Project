@@ -106,10 +106,11 @@ var ViewModel = function() {
   this.panToMap = function() {
     this.$data = $("#selector");
     for(var i = 0; i < locations.length; i++) {
-      if (this.$data == locations[i].title) {
+      if (this.$data === locations[i].title) {
         this.lat = locations[i].location.lat;
         this.lng = locations[i].location.lng;
-        google.maps.panTo(this.lat, this.lng);
+        var latLng = new google.maps.LatLng(locations[i].location.lat, locations[i].location.lng);
+        google.maps.panTo(latLng);
       }
     }
   }
