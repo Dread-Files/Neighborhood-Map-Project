@@ -10,14 +10,15 @@ var locations = [
     {title: "Burke Lake Park", location:{lat :38.760764, lng: -77.307478}},
     {title: "Ocean City, VA", location:{lat: 38.391591, lng: -75.064601}}
 ];
-
+//initalizes the map.
 function initMap() {
+  //embeds the map in an html element with the id = map
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 10, center:{lat: 38.907313, lng: -76.774371}
   });
 
   infoWindow = new google.maps.InfoWindow();
-
+  // create the infoWindow for each item in the locations arrey.
   for (var i = 0; i < locations.length; i++) {
     createMarkersForPlaces();
   }
@@ -41,7 +42,7 @@ function initMap() {
 
     markers.push(marker);
   }
-
+  // this function adds content to the infoWindow when a marker is selected.
   function populateInfoWindow(marker, infoWindow) {
     if (infoWindow.marker != marker) {
       infoWindow.marker = marker;
@@ -49,7 +50,7 @@ function initMap() {
       infoWindow.setContent("<div><h2>" + marker.title + "</h2></div>" + "<div id=\"wiki-container\">" +
           "<h3 id=\"wikipedia-header\">Relevant Wikipedia Links</h3>" +
           "</div>");
-
+      // this section uses  wiki api to add links for more relevent information.
       var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&format=json&callback=wikiCallback';
       $.ajax({
         url: wikiUrl,
@@ -74,7 +75,7 @@ function initMap() {
     infoWindow.open(map, marker);
   }
 }
-
+// this function is suppose to filter the list in the side panel, but isn't working.
 function myFunction() {
     var input, filter, ul, li, a, i;
     input = document.getElementById('search-box');
@@ -91,23 +92,25 @@ function myFunction() {
         }
     }
 }
-
+// this section utilizes the knockout library.
 var ViewModel = function() {
   var self = this;
-
+  // here the elements in locations arrey is passed to listMarkers arrey and then displayed in a list, in the side panel.
   this.listMarkers = ko.observableArray();
   for(var i = 0; i < locations.length; i++) {
     this.listMarkers.push(locations[i]);
   }
-
+  // this function is suppose to filter throught the list when text is entered in the search bar, currently isn't working properly.
   this.panToMap = function() {
+    this.$data = ko.observable();
     this.$data = $("#selector");
     for(var i = 0; i < locations.length; i++) {
+      this.lat = ko.observable();
+      this.lng = ko.observable();
       if (this.$data === locations[i].title) {
         this.lat = locations[i].location.lat;
         this.lng = locations[i].location.lng;
-        var latLng = new google.maps.LatLng(locations[i].location.lat, locations[i].location.lng);
-        google.maps.panTo(latLng);
+        google.maps.panTo(this.lat, this.lng);
       }
     }
   }
