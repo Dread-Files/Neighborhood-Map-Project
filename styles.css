@@ -2,11 +2,13 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 .container {
   height: 100%;
   position: relative;
+  background-color: #373b42;
 }
 
 #map {
@@ -22,26 +24,32 @@ html, body {
   height: 100%;
   text-align: left;
   border: 1px solid black;
-  border-radius: 5px;
   padding: 10px 10px 0 10px;
 }
 
 h1 {
   text-align: center;
-  font-size: 25px;
+  font-size: 30px;
   margin: 0 0 10px 0;
 }
 
 #search-box {
-  width: 262px;
+  width: 345px;
   height: 30px;
 }
 
-#search-button {
-  width: 80px;
-  height: 35px;
-  border-radius: 5px;
+ul {
+  padding-left: 0pt;
 }
+
 li {
+  color: #4476ce;
   display: block;
+  padding: 1.0em;
+  border-bottom: 1px solid grey;
+  cursor: pointer;
+}
+
+li:hover {
+  background-color: #5c5d60;
 }

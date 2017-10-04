@@ -5,16 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <link href="styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   </head>
   <body>
     <div class="container">
       <div class="search-panel">
         <h1>Intresting Places to visit!</h1>
         <hr>
-        <input id="search-box" data-bind="function: filteredItems(), valueUpdate: 'afterkeydown'" type="text" placeholder="Search An Address">
-        <input id="search-button" type="button" value="Search">
+        <input id="search-box" data-bind="textinput:filter" type="text" placeholder="Search An Address">
         <hr>
-        <ul id="items" data-bind="foreach: listMarkers">
+        <ul id="items" data-bind="foreach: filteredItems">
           <li id="selector" data-bind="text: title, click: $parent.panToMap"></li>
         </ul>
       </div>
