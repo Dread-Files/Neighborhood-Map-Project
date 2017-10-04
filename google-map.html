@@ -11,7 +11,7 @@
       <div class="search-panel">
         <h1>Intresting Places to visit!</h1>
         <hr>
-        <input id="search-box" type="text" placeholder="Search An Address">
+        <input id="search-box" data-bind="function: filteredItems(), valueUpdate: 'afterkeydown'" type="text" placeholder="Search An Address">
         <input id="search-button" type="button" value="Search">
         <hr>
         <ul id="items" data-bind="foreach: listMarkers">
@@ -25,7 +25,7 @@
      src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyDxhORQd05l_3z_P-rmUG9AFOoF5oTLLXc&callback=initMap">
     </script>
     <script src="knockout-3.4.2.js"></script>
-    <script async src="jquery-3.2.1.min.js"></script>
+    <script src="jquery-3.2.1.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -75,46 +75,41 @@ function initMap() {
     infoWindow.open(map, marker);
   }
 }
-// this function is suppose to filter the list in the side panel, but isn't working.
-function myFunction() {
-    var input, filter, ul, li, a, i;
-    input = document.getElementById('search-box');
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("items");
-    li = ul.getElementsByTagName('li');
 
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
-        } else {
-            li[i].style.display = "none";
-        }
-    }
-}
 // this section utilizes the knockout library.
 var ViewModel = function() {
-  var self = this;
   // here the elements in locations arrey is passed to listMarkers arrey and then displayed in a list, in the side panel.
-  this.listMarkers = ko.observableArray();
+  this.listMarkers = ko.observableArray([]);
   for(var i = 0; i < locations.length; i++) {
     this.listMarkers.push(locations[i]);
   }
   // this function is suppose to filter throught the list when text is entered in the search bar, currently isn't working properly.
-  this.panToMap = function() {
-    this.$data = ko.observable();
-    this.$data = $("#selector");
+  this.panToMap = ko.computed(function() {
+    this.data = document.getElementById("#selector");
+    console.log(this.data);
     for(var i = 0; i < locations.length; i++) {
       this.lat = ko.observable();
       this.lng = ko.observable();
-      if (this.$data === locations[i].title) {
+      if (this.data === locations[i].title) {
         this.lat = locations[i].location.lat;
         this.lng = locations[i].location.lng;
         google.maps.panTo(this.lat, this.lng);
       }
     }
-  }
+  });
+
+  this.filteredItems = ko.computed(function() {
+      this.filter = ko.observable();
+      if (!filter) {
+          return this.listMarkers;
+      } else {
+          return ko.utils.arrayFilter(this.listMarkers, function(item) {
+              return ko.utils.stringStartsWith(listMarkers.title.toLowerCase(), filter);
+          });
+      }
+  });
 }
+
 
 var viewModel = new ViewModel();
 
