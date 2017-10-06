@@ -2,21 +2,12 @@ var map,
     infoWindow,
     markers = [];
 
-// my locations arrey to add markers and knockout
-var locations = [
-    {title: "Six flags America", location:{lat: 38.907313, lng: -76.774371}},
-    {title: "Mount Vernon, VA", location:{lat: 38.707961, lng: -77.086521}},
-    {title: "Smithsonian National Museum", location:{lat: 38.888152, lng: -77.019868}},
-    {title: "Burke Lake Park", location:{lat :38.760764, lng: -77.307478}},
-    {title: "Ocean City, VA", location:{lat: 38.391591, lng: -75.064601}}
-];
-
 // initalizes the map.
 function initMap() {
 
   // loads the map in an html element with an id = map
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 10, center:{lat: 38.907313, lng: -76.774371}
+    zoom: 8, center:{lat: 38.907313, lng: -76.774371}
   });
 
   infoWindow = new google.maps.InfoWindow();
@@ -33,7 +24,6 @@ function initMap() {
 
     var marker = new google.maps.Marker({
       position: position,
-      animation: google.maps.Animation.DROP,
       map: map,
       title: title,
       id: i,
@@ -57,12 +47,12 @@ function initMap() {
 
   // this function adds content to the infoWindow when a marker is selected.
   function populateInfoWindow(marker, infoWindow) {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function() {
+      marker.setAnimation(null);
+    }, 750);
     if (infoWindow.marker != marker) {
       infoWindow.marker = marker;
-
-      infoWindow.setContent("<div><h2>" + marker.title + "</h2></div>" + "<div id=\"wiki-container\">" +
-          "<h3 id=\"wikipedia-header\">Relevant Wikipedia Links</h3>" +
-          "</div>");
 
 // wiki api adds links for more relevent information to their apropriate infoWindow.
       var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + marker.title + '&format=json&callback=wikiCallback';
@@ -71,14 +61,39 @@ function initMap() {
         dataType: 'jsonp',
         success: function(responce) {
           console.log(responce);
-          var articlelist = responce[1];
-          for(var i = 0; i < articlelist.length; i++) {
-            articleStr = articlelist[i];
-            var url = 'http://en.wikipidia.org/wiki/' + responce[3];
-            var $wikiElem = $('#wiki-container');
-            $wikiElem.append('<span><a href=\"' + url + '\">' + articleStr + '</a></span><br>');
+            var articleStr = responce[1];
+            var url = responce[3];
+            var info = responce[2];
+            infoWindow.setContent("<div><h2>" + marker.title + "</h2></div>" + "<div>" +
+                "<h3 id=\"wikipedia-header\">Relevant Wikipedia Link</h3>" +
+                "<p><a href=\"" + url[0] + "\">" + articleStr[0] + "</a></p>" +
+                "<p>" + info[0] + "</p></div>");
+        },
+      });
+
+      infoWindow.open(map, marker);
+      infoWindow.addListener('closeclick', function() {
+        infoWindow.marker = null;
+      });
+    } else {
+      $.ajax({
+        error: function (jqXHR, exception) {
+          var message = '';
+          if (jqXHR.status == 404) {
+              msg = 'Requested page not found. [404]';
+          } else if (jqXHR.status == 500) {
+              msg = 'Internal Server Error [500].';
+          } else if (exception === 'parsererror') {
+              msg = 'Requested JSON parse failed.';
+          } else if (exception === 'timeout') {
+              msg = 'Time out error.';
+          } else if (exception === 'abort') {
+              msg = 'Ajax request aborted.';
+          } else {
+              msg = 'Uncaught Error.\n' + jqXHR.responseText;
           }
-        }
+          infoWindow.setContent(message);
+        },
       });
 
       infoWindow.open(map, marker);
@@ -88,6 +103,23 @@ function initMap() {
     }
     infoWindow.open(map, marker);
   }
+}
+
+// pop-in and pop-out the side panel
+function myFunction(x) {
+    x.classList.toggle("change");
+    if(document.getElementById("search-panel").style.left !== "0" && document.getElementById("map").style.left !== "370px") {
+      document.getElementById("search-panel").style.left = "0";
+      document.getElementById("map").style.left = "370px";
+    } else {
+      document.getElementById("search-panel").style.left = "-360px";
+      document.getElementById("map").style.left = "0";
+    }
+}
+
+// error handling for the map
+function mapError() {
+  $("#map").append("<h1>Error while loading the map!</h1>");
 }
 
 // this section utilizes the knockout library.
@@ -103,7 +135,7 @@ var ViewModel = function() {
 // uses the location object in the locations arrey to center on a marker
     map.panTo(location.location);
     google.maps.event.trigger(location.markers, 'click');
-  }
+  };
 
 // knockout filter function to 'filter' items in the side panel
   this.filteredItems = ko.computed(function() {
@@ -120,4 +152,4 @@ var ViewModel = function() {
          return match;
       });
   });
-}
+};
