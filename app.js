@@ -69,28 +69,22 @@ function initMap() {
                 "<p><a href=\"" + url[0] + "\">" + articleStr[0] + "</a></p>" +
                 "<p>" + info[0] + "</p></div>");
         },
-      });
-
-      infoWindow.open(map, marker);
-      infoWindow.addListener('closeclick', function() {
-        infoWindow.marker = null;
-      });
-    } else {
-      $.ajax({
         error: function (jqXHR, exception) {
           var message = '';
-          if (jqXHR.status == 404) {
-              msg = 'Requested page not found. [404]';
+          if (jqXHR.status === 0) {
+              message = 'Not connect.\n Verify Network.';
+          } else if (jqXHR.status == 404) {
+              message = 'Requested page not found. [404]';
           } else if (jqXHR.status == 500) {
-              msg = 'Internal Server Error [500].';
+              message = 'Internal Server Error [500].';
           } else if (exception === 'parsererror') {
-              msg = 'Requested JSON parse failed.';
+              message = 'Requested JSON parse failed.';
           } else if (exception === 'timeout') {
-              msg = 'Time out error.';
+              message = 'Time out error.';
           } else if (exception === 'abort') {
-              msg = 'Ajax request aborted.';
+              message = 'Ajax request aborted.';
           } else {
-              msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              message = 'Uncaught Error.\n' + jqXHR.responseText;
           }
           infoWindow.setContent(message);
         },

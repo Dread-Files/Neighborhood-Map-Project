@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <title>Google Maps Project</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <div id="menu-btn" onclick="myFunction(this)">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </div>
+      <h1>Intresting Places to visit!</h1>
+    </header>
+    <main class="container">
+      <aside id="search-panel">
+        <input id="search-box" data-bind="textinput:filter" type="text" placeholder="Filter markers">
+        <hr>
+        <ul id="items" data-bind="foreach: filteredItems">
+          <li id="selector" data-bind="text: title, click: $parent.panToMap"></li>
+        </ul>
+      </aside>
+      <div id="map"></div>
+    </main>
+    <script src="locations.js"></script>
+    <script src="knockout-3.4.2.js"></script>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="app.js"></script>
+    <script async defer
+     src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyDxhORQd05l_3z_P-rmUG9AFOoF5oTLLXc&callback=initMap"
+     onerror="mapError()">
+    </script>
+  </body>
+</html>
